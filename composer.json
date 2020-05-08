@@ -1,0 +1,29 @@
+{
+    "name": "nikservik/subscriptions",
+    "description": "Paid subscriptions for Laravel based on CloudPayments",
+    "type": "laravel-package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sergey Nikiforov",
+            "email": "ser.nikiforov@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.2.5",
+        "laravel/framework": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nikservik\\Subscriptions\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nikservik\\Subscriptions\\SubscriptionsServiceProvider"
+            ]
+        }
+    }
+}
