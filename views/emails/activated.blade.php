@@ -13,7 +13,7 @@
         @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.trial1', ['tariff' => $subscription->name['ru'] ])])
         @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.trial2')])
     @endif
-    @if($subscription->isFree())
+    @if($subscription->isEndless() and $subscription->price == 0)
         @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.free1', ['tariff' => $subscription->name['ru'] ])])
         @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.free2')])
     @endif
