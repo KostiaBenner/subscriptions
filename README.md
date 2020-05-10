@@ -2,7 +2,7 @@
 ## Установка
 `composer require nikservik/subscriptions`
 ### Конфигурация
-`vendor:publish --provider="Nikservik\Subscriptions\SubscriptionsServiceProvider" --tag=config`
+`php artisan vendor:publish --provider="Nikservik\Subscriptions\SubscriptionsServiceProvider" --tag=config`
 #### Настройка CloudPayments
 Включите уведомление Receipt в настройках сервера в личном кабинете CloudPayments
 `https://your-server.com/api/cp/receipt`
@@ -14,7 +14,7 @@ CLOUDPAYMENTS_PUBLICID=
 CLOUDPAYMENTS_SECRET=
 ```
 ### Миграции
-`vendor:publish --provider="Nikservik\Subscriptions\SubscriptionsServiceProvider" --tag=migrations`
+`php artisan vendor:publish --provider="Nikservik\Subscriptions\SubscriptionsServiceProvider" --tag=migrations`
 `php artisan migrate`
 ### Модель User
 `use Subscription;`
@@ -31,7 +31,7 @@ CLOUDPAYMENTS_SECRET=
 ```
 
 ## Локализация
-`vendor:publish --provider="Nikservik\Subscriptions\SubscriptionsServiceProvider" --tag=translations`
+`php artisan vendor:publish --provider="Nikservik\Subscriptions\SubscriptionsServiceProvider" --tag=translations`
 Копирует файлы локалицации в папку `resources/lang/vendor/subscriptions`
 Названия возможностей для тарифов в файле `features.php`
 ## Уведомления на email

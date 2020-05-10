@@ -5,8 +5,17 @@
 @endsection
 @section('content')
     @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.hello', ['name' => $subscription->user->name])])
-    @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.line1', ['app' => __('app.name')])])
-    @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.line2')])
-    @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.line3')])
+    @if($subscription->isPaid())
+        @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.paid1', ['tariff' => $subscription->name['ru'] ])])
+        @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.paid2')])
+    @endif
+    @if($subscription->isTrial())
+        @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.trial1', ['tariff' => $subscription->name['ru'] ])])
+        @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.trial2')])
+    @endif
+    @if($subscription->isFree())
+        @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.free1', ['tariff' => $subscription->name['ru'] ])])
+        @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.free2')])
+    @endif
     @include('subscriptions::emails.parts.line', ['text' => __('subscriptions::emails/activated.signature', ['name' => __('app.name')])])
 @endsection
