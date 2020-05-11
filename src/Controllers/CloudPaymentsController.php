@@ -1,6 +1,6 @@
 <?php
 
-namespace Nikservik\Subscriptions;
+namespace Nikservik\Subscriptions\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,8 +13,11 @@ class CloudPaymentsController extends Controller
 {
     public static function apiRoutes() 
     { 
-        Route::post('api/cp/pay', 'Nikservik\Subscriptions\CloudPaymentsController@pay');
-        Route::post('api/cp/receipt', 'Nikservik\Subscriptions\CloudPaymentsController@receipt');
+        Route::prefix('api/cp')->namespace('Nikservik\Subscriptions\Controllers')
+            ->group(function () {
+            Route::post('pay', 'CloudPaymentsController@pay');
+            Route::post('receipt', 'CloudPaymentsController@receipt');
+        });
     }
 
     public function __construct()

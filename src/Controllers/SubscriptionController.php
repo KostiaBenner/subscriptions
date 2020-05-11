@@ -1,6 +1,6 @@
 <?php
 
-namespace Nikservik\Subscriptions;
+namespace Nikservik\Subscriptions\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\User;
@@ -20,7 +20,7 @@ class SubscriptionController extends Controller
 {
     public static function apiRoutes() 
     { 
-        Route::prefix('api/subscriptions')->namespace('Nikservik\Subscriptions')
+        Route::prefix('api/subscriptions')->namespace('Nikservik\Subscriptions\Controllers')
             ->group(function () {
             Route::get('', 'SubscriptionController@index');
             Route::get('translations', 'SubscriptionController@translations');
