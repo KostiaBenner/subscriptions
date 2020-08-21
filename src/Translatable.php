@@ -31,7 +31,7 @@ class Translatable implements Arrayable
 
     public function __toString()
     {
-        return $this->getTranslation($this->currentLocale);
+        return (string) $this->getTranslation($this->currentLocale);
     }
 
     public function __get($locale)

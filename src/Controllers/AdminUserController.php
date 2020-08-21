@@ -24,11 +24,11 @@ class AdminUserController extends Controller
     static function routes()
     {
         Route::domain('admin.'.Str::after(config('app.url'),'//'))
-            ->namespace('Nikservik\Subscriptions\Controllers')->prefix('users')->group(function () {
-            Route::post('{user}/subscription', 'AdminUserController@subscription')->middleware('can:update,user');
-            Route::get('search', 'AdminUserController@search')->middleware('can:viewAny,App\User');
-            Route::get('payments/{payment}/delete', 'AdminUserController@refund')->middleware('can:delete,payment');
-            Route::resource('', 'AdminUserController');
+            ->namespace('Nikservik\Subscriptions\Controllers')->group(function () {
+            Route::post('users/{user}/subscription', 'AdminUserController@subscription')->middleware('can:update,user');
+            Route::get('users/search', 'AdminUserController@search')->middleware('can:viewAny,App\User');
+            Route::get('users/payments/{payment}/delete', 'AdminUserController@refund')->middleware('can:delete,payment');
+            Route::resource('users', 'AdminUserController');
         });
     }
 
