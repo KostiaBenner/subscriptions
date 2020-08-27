@@ -21,6 +21,11 @@ class Tariff extends Model
 
     protected $appends = ['type', 'visible', 'default'];
 
+    public function getFeaturesAttribute($value)
+    {
+        return is_null($value) ? [] : $value;
+    }
+
     public function getDefaultAttribute() 
     {
         return Arr::get($this->availability, 'default', false);

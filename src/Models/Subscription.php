@@ -22,6 +22,11 @@ class Subscription extends Model
         'name' => TranslatableField::class,
     ];
 
+    public function getFeaturesAttribute($value)
+    {
+        return is_null($value) ? [] : $value;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
