@@ -2,15 +2,15 @@
 
 @section('content')
 <h1 class="page-header">
-	<a href="/users" class="text-white">@lang('admin/users.listTitle')</a> 
+	<a href="/users" class="text-white">@lang('subscriptions::admin/users.listTitle')</a> 
 </h1>
 <h2 class="sub-header">{{ $user->name }}</h2>
 <div class="mb-4 text-right">
     <a class="button small mr-4" href="/users/{{ $user->id }}/edit">
-        @lang('admin/users.modify')
+        @lang('subscriptions::admin/users.modify')
     </a>
-    <a class="button small red" href="javascript:document.user_delete.submit()" onclick="return confirm('@lang('admin/users.confirmDelete')')">
-        @lang('admin/users.delete')
+    <a class="button small red" href="javascript:document.user_delete.submit()" onclick="return confirm('@lang('subscriptions::admin/users.confirmDelete')')">
+        @lang('subscriptions::admin/users.delete')
     </a>
 </div>
     <form name="user_delete" action="/users/{{ $user->id }}" method="POST">
@@ -20,25 +20,28 @@
 
 <div class="flex items-center mt-8 mb-4 mx-10">
     @if($user->hasVerifiedEmail())
-        <div class="rounded inline-block px-3 py-1 bg-indigo-400 text-white">
-            @lang('admin/users.verificationDone')
-        </div>
+        ✅
     @else
-        <div class="rounded inline-block px-3 py-1 bg-indigo-300 text-white">
-            @lang('admin/users.verificationSent')
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"class="inline-block fill-current text-gray-500"><path class="heroicon-ui" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm1-8.41l2.54 2.53a1 1 0 0 1-1.42 1.42L11.3 12.7A1 1 0 0 1 11 12V8a1 1 0 0 1 2 0v3.59z"/></svg>
     @endif
-    <div class="px-3">{{ $user->email }} </div>
+    <div class="px-2">{{ $user->email }}</div>
+    @if (! $user->hasVerifiedEmail())
+        <div><a class="button small light" href="javascript:document.user_verify.submit()">@lang('subscriptions::admin/users.verify')</a></div>
+        <form name="user_verify" action="/users/{{ $user->id }}/verify" method="POST">
+            @csrf 
+            @method('PATCH')
+        </form>
+    @endif
 </div> 
-<p class="my-4 mx-10">@lang('admin/users.registered') {{ $user->created_at->format('d.m.Y') }}</p>
+<p class="my-4 mx-10">@lang('subscriptions::admin/users.registered') {{ $user->created_at->format('d.m.Y') }}</p>
 
-<p class="my-4 mx-10">@lang('admin/users.role'): @lang('app.role'.$user->role)</p>
+<p class="my-4 mx-10">@lang('subscriptions::admin/users.role'): @lang('app.role'.$user->role)</p>
 
 
-<h2 class="sub-title">@lang('admin/users.subscription')</h2>
+<h2 class="sub-title">@lang('subscriptions::admin/users.subscription')</h2>
 
 @if($user->subscription())
-    <p class="my-4 mx-10 font-bold">@lang('admin/users.tariff') {{ $user->subscription()->name }}</p>
+    <p class="my-4 mx-10 font-bold">@lang('subscriptions::admin/users.tariff') {{ $user->subscription()->name }}</p>
 
     <p class="my-2 mx-10">
         @foreach($user->subscription()->features as $feature)
@@ -51,7 +54,7 @@
     @csrf
     <div class="flex items-end">
         <div class="form-group flex-grow mt-8 @error('tariff') has-error @enderror">
-            <label for="tariff">@lang('admin/users.changeTariff')</label>
+            <label for="tariff">@lang('subscriptions::admin/users.changeTariff')</label>
             <select name="tariff" class="block">
                 @foreach($tariffs as $tariff)
                     <option value="{{ $tariff->id }}" @if(old('tariff')==$tariff->id)selected=""@endif>{{ $tariff->name }}</option>
@@ -64,19 +67,19 @@
             @enderror
         </div>
         <div class="form-group text-center">
-            <button type="submit" class="button">@lang('admin/users.save')</button>
+            <button type="submit" class="button">@lang('subscriptions::admin/users.save')</button>
         </div>
     </div>
 </form>
 
-<h2 class="sub-title">@lang('admin/users.payments')</h2>
+<h2 class="sub-title">@lang('subscriptions::admin/users.payments')</h2>
 
 <table class="table-auto w-full mt-8 mb-4">
     <thead>
         <tr>
-            <th>@lang('admin/users.date')</th>
-            <th>@lang('admin/users.card')</th>
-            <th>@lang('admin/users.amount')</th>
+            <th>@lang('subscriptions::admin/users.date')</th>
+            <th>@lang('subscriptions::admin/users.card')</th>
+            <th>@lang('subscriptions::admin/users.amount')</th>
             <th></th>
         </tr>
     </thead>
@@ -88,15 +91,15 @@
                 <td>{{ $payment->amount }} {{ $payment->currency }}</td>
                 <td>
                     @if($payment->status == 'Completed')
-                        <a class="button small light" href="/users/payments/{{ $payment->id }}/delete" onclick="return confirm('@lang('admin/users.confirmRefund')')">
-                            @lang('admin/users.refund')
+                        <a class="button small light" href="/users/payments/{{ $payment->id }}/delete" onclick="return confirm('@lang('subscriptions::admin/users.confirmRefund')')">
+                            @lang('subscriptions::admin/users.refund')
                         </a>
                     @else
                         @if($payment->status == 'Authorized')
-                            @lang('admin/users.Authorized')
+                            @lang('subscriptions::admin/users.Authorized')
                         @endif
                         @if($payment->status == 'Refunded')
-                            @lang('admin/users.Refunded')
+                            @lang('subscriptions::admin/users.Refunded')
                         @endif
                     @endif
                 </td>

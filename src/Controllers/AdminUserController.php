@@ -10,6 +10,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -25,9 +26,10 @@ class AdminUserController extends Controller
     {
         Route::domain('admin.'.Str::after(config('app.url'),'//'))
             ->namespace('Nikservik\Subscriptions\Controllers')->group(function () {
-            Route::post('users/{user}/subscription', 'AdminUserController@subscription')->middleware('can:update,user');
-            Route::get('users/search', 'AdminUserController@search')->middleware('can:viewAny,App\User');
-            Route::get('users/payments/{payment}/delete', 'AdminUserController@refund')->middleware('can:delete,payment');
+            Route::patch('users/{user}/verify', 'AdminUserController@verify');
+            Route::post('users/{user}/subscription', 'AdminUserController@subscription');
+            Route::get('users/search', 'AdminUserController@search');
+            Route::get('users/payments/{payment}/delete', 'AdminUserController@refund');
             Route::resource('users', 'AdminUserController');
         });
     }
@@ -36,6 +38,9 @@ class AdminUserController extends Controller
     {
         $this->middleware(['web', 'auth:web', 'isAdmin']);
         $this->authorizeResource(User::class, 'user');
+        $this->middleware('can:update,user')->only(['verify', 'subscription']);
+        $this->middleware('can:viewAny,App\User')->only('search');
+        $this->middleware('can:delete,payment')->only('refund');
     }
     /**
      * Display a listing of the resource.
@@ -111,6 +116,15 @@ class AdminUserController extends Controller
         if ($request->password)
             $user->password = Hash::make($request->password);
 
+        $user->save();
+
+        return redirect('/users/'.$user->id);
+    }
+
+    public function verify(User $user)
+    {
+        Log::debug($user);
+        $user->email_verified_at = Carbon::now();
         $user->save();
 
         return redirect('/users/'.$user->id);
