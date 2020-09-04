@@ -23,7 +23,7 @@ class Tariff extends Model
 
     public function getFeaturesAttribute($value)
     {
-        return is_null($value) ? [] : $value;
+        return is_null($value) ? [] : json_decode($value, true);
     }
 
     public function getDefaultAttribute() 
