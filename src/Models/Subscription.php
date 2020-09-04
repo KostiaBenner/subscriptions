@@ -4,6 +4,7 @@ namespace Nikservik\Subscriptions\Models;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Nikservik\Subscriptions\Models\Payment;
 use Nikservik\Subscriptions\TranslatableField;
 
@@ -24,7 +25,7 @@ class Subscription extends Model
 
     public function getFeaturesAttribute($value)
     {
-        return is_null($value) ? [] : $value;
+        return is_null($value) ? [] : json_decode($value, true);
     }
 
     public function user()
