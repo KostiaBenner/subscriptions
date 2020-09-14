@@ -4,6 +4,7 @@ namespace Nikservik\Subscriptions\CloudPayments;
 
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Nikservik\Subscriptions\CloudPayments\ApiResponse;
 use Nikservik\Subscriptions\CloudPayments\PaymentApiResponse;
@@ -23,47 +24,47 @@ class CloudPaymentsManager
         $this->apiUrl = config('cloudpayments.apiUrl');
     }
 
-    public function apiTest()
+    public function apiTest(): ApiResponse
     {
         return new ApiResponse($this->requestCpApi('test'));
     }
 
-    public function paymentsCardsCharge(CardChargeRequest $bill)
+    public function paymentsCardsCharge(CardChargeRequest $bill): PaymentApiResponse
     {
         return new PaymentApiResponse(
             $this->requestCpApi('payments/cards/charge', $bill->toArray()) 
         );
     }
 
-    public function paymentsCardsAuth(CardChargeRequest $bill)
+    public function paymentsCardsAuth(CardChargeRequest $bill): PaymentApiResponse
     {
         return new PaymentApiResponse(
             $this->requestCpApi('payments/cards/auth', $bill->toArray()) 
         );
     }
 
-    public function paymentsCardsPost3ds(Post3dsRequest $bill)
+    public function paymentsCardsPost3ds(Post3dsRequest $bill): PaymentApiResponse
     {
         return new PaymentApiResponse(
             $this->requestCpApi('payments/cards/post3ds', $bill->toArray()) 
         );
     }
 
-    public function paymentsTokensCharge(TokenChargeRequest $bill)
+    public function paymentsTokensCharge(TokenChargeRequest $bill): PaymentApiResponse
     {
         return new PaymentApiResponse(
             $this->requestCpApi('payments/tokens/charge', $bill->toArray()) 
         );
     }
 
-    public function paymentsVoid($transactionId)
+    public function paymentsVoid($transactionId): ApiResponse 
     {
         return new ApiResponse(
             $this->requestCpApi('payments/void', ['TransactionId' => $transactionId]) 
         );
     }
 
-    public function paymentsRefund($transactionId, $amount)
+    public function paymentsRefund($transactionId, $amount): ApiResponse
     {
         return new ApiResponse(
             $this->requestCpApi('payments/refund', [
@@ -73,26 +74,12 @@ class CloudPaymentsManager
         );
     }
 
-    public function kktReceipt(Receipt $receipt)
-    {
-        return new ApiResponse(
-            $this->requestCpApi('kkt/receipt', $receipt->toArray()) 
-        );
-    }
-
-    public function kktReceiptStatusGet($id)
-    {
-        return new ApiResponse(
-            $this->requestCpApi('kkt/receipt/status/get', ['Id' => $id]) 
-        );
-    }
-
-    public function validateSecrets(Request $request)
+    public function validateSecrets(Request $request): bool
     {
         return $this->verifyNotificationRequest($request);
     }
 
-    public function verifyNotificationRequest(Request $request)
+    public function verifyNotificationRequest(Request $request): bool
     {
         if (empty($secretCloudPayments = $request->header('Content-Hmac')))
             return false;
@@ -109,22 +96,16 @@ class CloudPaymentsManager
         return $secret === $secretCloudPayments;
     }
 
-    protected function requestCpApi(string $url, array $params=[])
+    protected function requestCpApi(string $url, array $params=[]): array
     {
-        $response = (new HttpClient())->request('POST', 
-            $this->apiUrl.$this->withLeadingSlash($url), 
-            [
-                // 'headers' => ['Content-Type: application/x-www-form-urlencoded'],
-                'auth' => [$this->publicId, $this->apiSecret],
-                'json' => $params,
-                'timeout' => 10,
-            ]
-        );
+        $response = Http::timeout(10)
+            ->withBasicAuth($this->publicId, $this->apiSecret)
+            ->post($this->apiUrl.$this->withLeadingSlash($url), ['json' => $params]);
 
-        return $response->getStatusCode() == 200 ? json_decode($response->getBody(), true) : [];
+        return $response->successful() ? json_decode($response->body(), true) : [];
     }
 
-    protected function withLeadingSlash($url)
+    protected function withLeadingSlash(string $url): string
     {
         return $url[0] == '/' ? $url : '/'.$url;
     }
