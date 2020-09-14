@@ -30,6 +30,6 @@ class ApiResponse
 
     public function getErrorMessage()
     {
-        return 'errors.failed';
+        return $this->isSuccessful() ? null : 'errors.failed';
     }
 }
