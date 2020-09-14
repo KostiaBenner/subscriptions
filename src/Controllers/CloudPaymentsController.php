@@ -15,7 +15,6 @@ class CloudPaymentsController extends Controller
     { 
         Route::prefix('api/cp')->namespace('Nikservik\Subscriptions\Controllers')
             ->group(function () {
-            Route::post('pay', 'CloudPaymentsController@pay');
             Route::post('receipt', 'CloudPaymentsController@receipt');
         });
     }
@@ -23,13 +22,6 @@ class CloudPaymentsController extends Controller
     public function __construct()
     {
         $this->middleware(['api']);
-    }
-
-    public function pay(Request $request)
-    {
-        Log::debug($request);
-        
-        return ['code' => 0];
     }
 
     public function receipt(Request $request)
