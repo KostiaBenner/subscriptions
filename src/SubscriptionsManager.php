@@ -4,6 +4,7 @@ namespace Nikservik\Subscriptions;
 
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Nikservik\Subscriptions\Facades\Payments;
 use Nikservik\Subscriptions\Mail\SubscriptionAboutToRenew;
@@ -86,7 +87,7 @@ class SubscriptionsManager
     public function chargePaid()
     {
         $toCharge = Subscription::where('next_transaction_date', '<', Carbon::now())
-            ->where('status', 'Active')->where('price', '>', 0)->where('prolongable', true)->get();
+            ->whereIn('status', ['Active', 'PastDue'])->where('price', '>', 0)->where('prolongable', true)->get();
 
         foreach ($toCharge as $subscription) {
             $this->charge($subscription);
@@ -113,7 +114,8 @@ class SubscriptionsManager
     public function endOutdated()
     {
         $outdated = Subscription::where('next_transaction_date', '<', Carbon::now())
-            ->where('prolongable', false)->get();
+            ->where('prolongable', false)
+            ->where('status', '<>', 'Ended')->get();
 
         foreach ($outdated as $subscription) {
             $subscription->status = 'Ended';
