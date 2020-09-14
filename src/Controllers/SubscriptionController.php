@@ -24,8 +24,8 @@ class SubscriptionController extends Controller
             ->group(function () {
             Route::get('', 'SubscriptionController@index');
             Route::get('translations', 'SubscriptionController@translations');
-            Route::get('payments', 'SubscriptionController@payments');
-            Route::post('', 'SubscriptionController@activate')->middleware('auth:api');
+            Route::get('payments', 'SubscriptionController@payments')->middleware('auth:api');
+            Route::post('', 'SubscriptionController@activateFree')->middleware('auth:api');
             Route::post('cancel', 'SubscriptionController@cancel')->middleware('auth:api');
             Route::post('crypt', 'SubscriptionController@crypt')->middleware('auth:api');
             Route::post('authorize', 'SubscriptionController@authorizeCrypt')->middleware('auth:api');
@@ -70,8 +70,12 @@ class SubscriptionController extends Controller
         ];
     }
 
-    public function activate(ActivateSubscriptionRequest $request)
+    public function activateFree(ActivateSubscriptionRequest $request)
     {
+        $tariff = Tariff::findOrFail($request->tariff);
+        if ($tariff->price != 0)
+            return ['status' => 'error'];
+
         $result = Subscriptions::activate(Auth::user(), Tariff::find($request->tariff));
 
         if (! $result)
@@ -87,6 +91,9 @@ class SubscriptionController extends Controller
 
     public function cancel()
     {
+        if (! Auth::user()->subscription())
+            return ['status' => 'error'];
+        
         $subscription = Subscriptions::cancel(Auth::user()->subscription());
 
         if (! $subscription)
