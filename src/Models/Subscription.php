@@ -18,8 +18,8 @@ class Subscription extends Model
         'features' => 'array',
         'availability' => 'array',
         'texts' => 'array',
-        'last_transaction_date' => 'date',
-        'next_transaction_date' => 'date',
+        'last_transaction_date' => 'datetime',
+        'next_transaction_date' => 'datetime',
         'name' => TranslatableField::class,
     ];
 
