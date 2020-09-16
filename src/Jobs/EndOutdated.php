@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class EndOutdated implements ShouldQueue
 {
@@ -29,6 +30,8 @@ class EndOutdated implements ShouldQueue
      */
     public function handle()
     {
-        Subscriptions::endOutdated();    
+        Log::debug('Cron job EndOutdated run');
+        $processed = Subscriptions::endOutdated();    
+        Log::debug("Processed $processed");   
     }
 }

@@ -92,6 +92,8 @@ class SubscriptionsManager
         foreach ($toCharge as $subscription) {
             $this->charge($subscription);
         }
+
+        return $toCharge->count();
     }
 
     public function warnBeforeCharge()
@@ -109,6 +111,8 @@ class SubscriptionsManager
         foreach ($toWarn as $subscription) {
             Mail::to($subscription->user->email)->queue(new SubscriptionAboutToRenew($subscription));
         }
+
+        return $toWarn->count();
     }
 
     public function endOutdated()
@@ -123,6 +127,8 @@ class SubscriptionsManager
             Mail::to($subscription->user->email)->queue(new SubscriptionEnded($subscription));
             $this->activateDefault($subscription->user);
         }
+
+        return $outdated->count();
     }
 
     public function endCancelled()
@@ -136,6 +142,8 @@ class SubscriptionsManager
             Mail::to($subscription->user->email)->queue(new SubscriptionEnded($subscription));
             $this->activateDefault($subscription->user);
         }
+
+        return $outdated->count();
     }
 
     public function features()

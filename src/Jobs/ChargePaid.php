@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Nikservik\Subscriptions\Facades\Subscriptions;
 
 class ChargePaid implements ShouldQueue
@@ -30,6 +31,8 @@ class ChargePaid implements ShouldQueue
      */
     public function handle()
     {
-        Subscriptions::chargePaid();    
+        Log::debug('Cron job ChargePaid run');
+        $processed = Subscriptions::chargePaid(); 
+        Log::debug("Processed $processed");   
     }
 }

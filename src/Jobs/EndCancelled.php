@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Nikservik\Subscriptions\Facades\Subscriptions;
 
 class EndCancelled implements ShouldQueue
@@ -30,6 +31,8 @@ class EndCancelled implements ShouldQueue
      */
     public function handle()
     {
-        Subscriptions::endCancelled();    
+        Log::debug('Cron job EndCancelled run');
+        $processed = Subscriptions::endCancelled();    
+        Log::debug("Processed $processed");   
     }
 }

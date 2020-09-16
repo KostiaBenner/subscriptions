@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class WarnBeforeCharge implements ShouldQueue
 {
@@ -29,6 +30,8 @@ class WarnBeforeCharge implements ShouldQueue
      */
     public function handle()
     {
-        Subscriptions::warnBeforeCharge();    
+        Log::debug('Cron job WarnBeforeCharge run');
+        $processed = Subscriptions::warnBeforeCharge();    
+        Log::debug("Processed $processed");   
     }
 }
