@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Nikservik\Subscriptions\Facades\Subscriptions;
 
 class EndOutdated implements ShouldQueue
 {
