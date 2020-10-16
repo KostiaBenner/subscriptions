@@ -4,7 +4,6 @@ namespace Tests\Subscriptions;
 
 use Carbon\Carbon;
 use Carbon\Carbonite;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 use Nikservik\Subscriptions\Facades\Subscriptions;
@@ -14,7 +13,6 @@ use Tests\TestCase;
 
 class WarnBeforeChargeTest extends TestCase
 {
-    use DatabaseTransactions;
 
     protected function setUp(): void
     {

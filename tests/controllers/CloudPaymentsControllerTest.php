@@ -2,13 +2,11 @@
 
 namespace Tests\Subscriptions;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nikservik\Subscriptions\Models\Payment;
 use Tests\TestCase;
 
 class CloudPaymentsControllerTest extends TestCase
 {
-    use DatabaseTransactions;
 
 
     public function testReceipt()

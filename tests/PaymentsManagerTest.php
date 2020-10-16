@@ -3,7 +3,6 @@
 namespace Tests\Subscriptions;
 
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Nikservik\Subscriptions\CloudPayments\ApiResponseFactory;
 use Nikservik\Subscriptions\CloudPayments\PaymentApiResponse;
@@ -17,7 +16,6 @@ use Tests\TestCase;
 
 class PaymentsManagerTest extends TestCase
 {
-    use DatabaseTransactions;
 
     public function testCharge()
     {

@@ -5,7 +5,6 @@ namespace Tests\Subscriptions;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +21,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SubscriptionControllerTest extends TestCase
 {
-    use DatabaseTransactions;
 
     protected function setUp(): void
     {

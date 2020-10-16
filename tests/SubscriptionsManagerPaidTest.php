@@ -5,7 +5,6 @@ namespace Tests\Subscriptions;
 use App\User;
 use Carbon\Carbon;
 use Carbon\Carbonite;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use Nikservik\Subscriptions\Facades\Subscriptions;
 use Nikservik\Subscriptions\Mail\SubscriptionActivated;
@@ -16,7 +15,6 @@ use Tests\TestCase;
 
 class SubscriptionsManagerPaidTest extends TestCase
 {
-    use DatabaseTransactions;
 
     public function testActivate()
     {

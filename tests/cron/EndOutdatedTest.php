@@ -4,7 +4,6 @@ namespace Tests\Subscriptions;
 
 use Carbon\Carbon;
 use Carbon\Carbonite;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use Nikservik\Subscriptions\Facades\Subscriptions;
 use Nikservik\Subscriptions\Mail\SubscriptionEnded;
@@ -14,7 +13,6 @@ use Tests\TestCase;
 
 class EndOutdatedTest extends TestCase
 {
-    use DatabaseTransactions;
 
     protected function setUp(): void
     {

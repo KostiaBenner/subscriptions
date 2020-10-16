@@ -3,7 +3,6 @@
 namespace Tests\Subscriptions;
 
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Nikservik\Subscriptions\Facades\Subscriptions;
 use Nikservik\Subscriptions\Models\Payment;
@@ -12,7 +11,6 @@ use Tests\TestCase;
 
 class SubscriptionsManagerTest extends TestCase
 {
-    use DatabaseTransactions;
 
     public function testListEmpty()
     {

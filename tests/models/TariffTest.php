@@ -2,13 +2,11 @@
 
 namespace Tests\Subscriptions;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nikservik\Subscriptions\Models\Tariff;
 use Tests\TestCase;
 
 class TariffTest extends TestCase
 {
-    use DatabaseTransactions;
     
     public function testEmptyFeatures()
     {

@@ -2,13 +2,11 @@
 
 namespace Tests\Subscriptions;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nikservik\Subscriptions\Models\Subscription;
 use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    use DatabaseTransactions;
     
     public function testEmptyFeatures()
     {

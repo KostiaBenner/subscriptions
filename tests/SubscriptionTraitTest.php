@@ -4,14 +4,12 @@ namespace Tests\Subscriptions;
 
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nikservik\Subscriptions\Models\Subscription;
 use Nikservik\Subscriptions\Models\Tariff;
 use Tests\TestCase;
 
 class SubscriptionTraitTest extends TestCase
 {
-    use DatabaseTransactions;
 
     public function testSubscriptionActive()
     {

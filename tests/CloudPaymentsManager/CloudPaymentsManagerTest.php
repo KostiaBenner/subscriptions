@@ -2,7 +2,6 @@
 
 namespace Tests\Subscriptions;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -17,7 +16,6 @@ use Tests\TestCase;
 
 class CloudPaymentsManagerTest extends TestCase
 {
-    use DatabaseTransactions;
     
     public function testCreate()
     {
