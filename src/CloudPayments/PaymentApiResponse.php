@@ -2,6 +2,7 @@
 
 namespace Nikservik\Subscriptions\CloudPayments;
 
+use Illuminate\Support\Facades\Log;
 use Nikservik\Subscriptions\CloudPayments\ApiResponse;
 
 class PaymentApiResponse extends ApiResponse
@@ -49,6 +50,7 @@ class PaymentApiResponse extends ApiResponse
 
     public function getErrorMessage()
     {
+        Log::debug($this->data);
         if (! $this->Model || ! array_key_exists($this->ReasonCode, $this->errorCodes))
             return 'errors.undefined';
 
