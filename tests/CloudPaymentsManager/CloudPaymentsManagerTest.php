@@ -118,7 +118,7 @@ class CloudPaymentsManagerTest extends TestCase
         $this->assertInstanceOf(ApiResponse::class, $response);
         Http::assertSent(function ($request) {
             return $request->url() == 'https://api.example.test/payments/void'
-                && $request['json'] == ['TransactionId' => 123456789];
+                && $request['TransactionId'] == 123456789;
         });      
     }
 
@@ -132,7 +132,8 @@ class CloudPaymentsManagerTest extends TestCase
         $this->assertInstanceOf(ApiResponse::class, $response);
         Http::assertSent(function ($request) {
             return $request->url() == 'https://api.example.test/payments/refund'
-                && $request['json'] == ['TransactionId' => 123456789, 'Amount' => 12.0];
+                && $request['TransactionId'] == 123456789
+                && $request['Amount'] == 12.0;
         });      
     }
 }
