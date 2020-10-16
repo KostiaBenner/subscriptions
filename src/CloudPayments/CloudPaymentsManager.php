@@ -2,7 +2,6 @@
 
 namespace Nikservik\Subscriptions\CloudPayments;
 
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -100,9 +99,9 @@ class CloudPaymentsManager
     {
         $response = Http::timeout(10)
             ->withBasicAuth($this->publicId, $this->apiSecret)
-            ->post($this->apiUrl.$this->withLeadingSlash($url), ['json' => $params]);
+            ->post($this->apiUrl.$this->withLeadingSlash($url), $params);
 
-        return $response->successful() ? json_decode($response->body(), true) : [];
+        return $response->successful() ? $response->json() : [];
     }
 
     protected function withLeadingSlash(string $url): string
