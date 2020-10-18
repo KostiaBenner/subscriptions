@@ -99,7 +99,7 @@ class CloudPaymentsManagerTest extends TestCase
         Http::fake(['*' => Http::response('{"Success":false,"Message":"Error message"}', 200, ['Headers']),]);
         
         $response = (new CloudPaymentsManager)->paymentsTokensCharge(
-            new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 'item')
+            new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item')
         );
 
         $this->assertInstanceOf(PaymentApiResponse::class, $response);

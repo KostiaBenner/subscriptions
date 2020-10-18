@@ -10,21 +10,21 @@ class TokenChargeRequestTest extends TestCase
 {
     public function testCreate()
     {
-        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 'item');
+        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item');
 
         $this->assertNotNull($request);
     }
 
     public function testToArray()
     {
-        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 'item');
+        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item');
 
         $this->assertIsArray($request->toArray());
     }
 
     public function testArrayItemParameters()
     {
-        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 'item');
+        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item');
 
         $this->assertEquals(12.0, Arr::get($request->toArray(), 'Amount'));
         $this->assertEquals('RUB', Arr::get($request->toArray(), 'Currency'));
@@ -34,7 +34,7 @@ class TokenChargeRequestTest extends TestCase
 
     public function testArrayUserParameters()
     {
-        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 'item');
+        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item');
 
         $this->assertEquals(1234, Arr::get($request->toArray(), 'AccountId'));
         $this->assertEquals(1234, Arr::get($request->toArray(), 'JsonData.cloudPayments.AccountId'));
@@ -43,8 +43,15 @@ class TokenChargeRequestTest extends TestCase
 
     public function testArrayToken()
     {
-        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 'item');
+        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item');
 
         $this->assertEquals('user token', Arr::get($request->toArray(), 'Token'));
+    }
+
+    public function testArrayInvoiceId()
+    {
+        $request= new TokenChargeRequest(12.0, 'RUB', 'user token', 1234, 'test@example.com', 54321, 'item');
+
+        $this->assertEquals(54321, Arr::get($request->toArray(), 'InvoiceId'));
     }
 }

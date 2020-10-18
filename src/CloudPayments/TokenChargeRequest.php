@@ -6,12 +6,13 @@ class TokenChargeRequest
 {
     protected $data;
 
-    function __construct($price, $currency, $token, $userId, $email, $description)
+    function __construct($price, $currency, $token, $userId, $email, $subscriptionId, $description)
     {
         $this->data = [
             'Amount' => $price, 
             'Currency' => $currency, 
             'AccountId' => $userId,
+            'InvoiceId' => $subscriptionId,
             'Token' => $token, 
             'Description' => $description,
             'JsonData' => [

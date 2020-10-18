@@ -127,7 +127,7 @@ class PaymentsManager
             return false;
 
         return new TokenChargeRequest($subscription->price, $subscription->currency,
-            $subscription->user->token, $subscription->user->id, $subscription->user->email,
+            $subscription->user->token, $subscription->user->id, $subscription->user->email, $subscription->id,
             __('subscriptions::payments.autocharge', ['app' => Str::after(config('app.url'), '//')])
         );
     }
