@@ -86,8 +86,10 @@ class SubscriptionsManager
 
     public function chargePaid()
     {
-        $toCharge = Subscription::where('next_transaction_date', '<', Carbon::now())
-            ->whereIn('status', ['Active', 'PastDue'])->where('price', '>', 0)->where('prolongable', true)->get();
+        $toCharge = Subscription::
+            whereRaw("next_transaction_date < ? AND status = 'Active' AND price > 0 AND prolongable = TRUE", [Carbon::now()])
+            ->orWhereRaw("next_transaction_date < ? AND HOUR(next_transaction_date) = ? AND status = 'PastDue' AND price > 0 AND prolongable = TRUE", [Carbon::now(), Carbon::now()->subHour()->hour])
+            ->get();
 
         foreach ($toCharge as $subscription) {
             $this->charge($subscription);

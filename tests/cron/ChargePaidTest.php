@@ -114,7 +114,7 @@ class ChargePaidTest extends TestCase
     public function testPastDueIfFailed()
     {
         $subscription = factory(Subscription::class)->states('paid', 'active')
-            ->create(['next_transaction_date' => Carbon::parse('2020-07-04 08:00:00'), 'period' => '1 month']);
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-04 23:40:00'), 'period' => '1 month']);
         Payments::shouldReceive('charge')->once()->andReturn(false);
 
         Subscriptions::chargePaid();
@@ -125,7 +125,7 @@ class ChargePaidTest extends TestCase
     public function testPastDueMailSent()
     {
         $subscription = factory(Subscription::class)->states('paid', 'active')
-            ->create(['next_transaction_date' => Carbon::parse('2020-07-04 08:00:00'), 'period' => '1 month']);
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-04 23:40:00'), 'period' => '1 month']);
         Payments::shouldReceive('charge')->once()->andReturn(false);
 
         Subscriptions::chargePaid();
@@ -136,18 +136,27 @@ class ChargePaidTest extends TestCase
     public function testPastDueSecondTime()
     {
         $subscription = factory(Subscription::class)->states('paid')
-            ->create(['next_transaction_date' => Carbon::parse('2020-07-03 08:00:00'), 'period' => '1 month', 'status' => 'PastDue']);
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-03 23:40:00'), 'period' => '1 month', 'status' => 'PastDue']);
         Payments::shouldReceive('charge')->once()->andReturn(false);
 
         Subscriptions::chargePaid();
+    }
 
-        $this->assertEquals('PastDue', $subscription->refresh()->status);
+    public function testPastDueTryOnlyIn24hours()
+    {
+        $subscription = factory(Subscription::class)->states('paid')
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-04 22:40:00'), 'period' => '1 month', 'status' => 'PastDue']);
+        Payments::shouldReceive('charge')->never();
+
+        Subscriptions::chargePaid();
+
+        Mail::assertNotQueued(SubscriptionPastDue::class);
     }
 
     public function testRejectedIfFailedAndOutdated()
     {
         $subscription = factory(Subscription::class)->states('paid', 'active')
-            ->create(['next_transaction_date' => Carbon::parse('2020-07-01 08:00:00'), 'period' => '1 month', 'status' => 'PastDue']);
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-01 23:40:00'), 'period' => '1 month', 'status' => 'PastDue']);
         Payments::shouldReceive('charge')->once()->andReturn(false);
 
         Subscriptions::chargePaid();
@@ -158,7 +167,7 @@ class ChargePaidTest extends TestCase
     public function testRejectedMailSent()
     {
         $subscription = factory(Subscription::class)->states('paid', 'active')
-            ->create(['next_transaction_date' => Carbon::parse('2020-07-01 08:00:00'), 'period' => '1 month', 'status' => 'PastDue']);
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-01 23:40:00'), 'period' => '1 month', 'status' => 'PastDue']);
         Payments::shouldReceive('charge')->once()->andReturn(false);
 
         Subscriptions::chargePaid();
@@ -169,7 +178,7 @@ class ChargePaidTest extends TestCase
     public function testRejectedDefaultActivated()
     {
         $subscription = factory(Subscription::class)->states('paid', 'active')
-            ->create(['next_transaction_date' => Carbon::parse('2020-07-01 08:00:00'), 'period' => '1 month', 'status' => 'PastDue']);
+            ->create(['next_transaction_date' => Carbon::parse('2020-07-01 23:40:00'), 'period' => '1 month', 'status' => 'PastDue']);
         $user = $subscription->user;
         Payments::shouldReceive('charge')->once()->andReturn(false);
 
