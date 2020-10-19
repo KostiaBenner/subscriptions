@@ -123,7 +123,6 @@ class AdminUserController extends Controller
 
     public function verify(User $user)
     {
-        Log::debug($user);
         $user->email_verified_at = Carbon::now();
         $user->save();
 
