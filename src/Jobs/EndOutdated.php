@@ -31,8 +31,7 @@ class EndOutdated implements ShouldQueue
      */
     public function handle()
     {
-        Log::debug('Cron job EndOutdated run');
         $processed = Subscriptions::endOutdated();    
-        Log::debug("Processed $processed");   
+        activity()->withProperties(['job' => 'EndOutdated', 'processed' => $processed])->log('executed');
     }
 }

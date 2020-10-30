@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Nikservik\Subscriptions\Models\Payment;
 use Nikservik\Subscriptions\TranslatableField;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Subscription extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'slug', 'name', 'price', 'currency', 'period', 'prolongable', 
     ];
@@ -22,6 +25,17 @@ class Subscription extends Model
         'next_transaction_date' => 'datetime',
         'name' => TranslatableField::class,
     ];
+
+    protected static $logAttributes = ['last_transaction_date', 'next_transaction_date', 'status'];
+    protected static $logOnlyDirty = true;
+
+    
+    public function __construct(array $attributes = [])
+    {
+        if (! config('subscriptions.log.subscriptions'))
+            $this->disableLogging();
+        parent::__construct($attributes);
+    }
 
     public function getFeaturesAttribute($value)
     {

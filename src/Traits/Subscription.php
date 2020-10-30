@@ -6,11 +6,20 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Nikservik\Subscriptions\Models\Payment;
 use Nikservik\Subscriptions\Models\Subscription as SubscriptionModel;
+use Spatie\Activitylog\Traits\CausesActivity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 trait Subscription
 {
+    use LogsActivity, CausesActivity;
+
+    protected static $logAttributes = ['*'];
+    protected static $logOnlyDirty = true;
+    
     public function __construct(array $attributes = [])
     {
+        if (! config('subscriptions.log.users'))
+            $this->disableLogging();
         $this->appends[] = 'subscription';
         $this->appends[] = 'features';
         $this->appends[] = 'hadTrial';
@@ -86,4 +95,13 @@ trait Subscription
         $settings['cardLastFour'] = $cardLastFour;
         $this->settings = $settings;
     }   
+
+    public function delete()
+    {
+        $subscription = $this->subscription();
+        $subscription->status = 'Ended';
+        $subscription->save();
+        
+        parent::delete();
+    }
 }

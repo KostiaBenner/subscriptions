@@ -31,8 +31,7 @@ class ChargePaid implements ShouldQueue
      */
     public function handle()
     {
-        Log::debug('Cron job ChargePaid run');
         $processed = Subscriptions::chargePaid(); 
-        Log::debug("Processed $processed");   
+        activity()->withProperties(['job' => 'ChargePaid', 'processed' => $processed])->log('executed');
     }
 }

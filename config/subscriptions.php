@@ -23,4 +23,9 @@ return [
         'read-books',
         'earn-money',
     ],
+    'log' => [
+        'requests' => true,
+        'subscriptions' => true,
+        'users' => true,
+    ],
 ];

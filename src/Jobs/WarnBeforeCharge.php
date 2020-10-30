@@ -31,8 +31,7 @@ class WarnBeforeCharge implements ShouldQueue
      */
     public function handle()
     {
-        Log::debug('Cron job WarnBeforeCharge run');
         $processed = Subscriptions::warnBeforeCharge();    
-        Log::debug("Processed $processed");   
+        activity()->withProperties(['job' => 'WarnBeforeCharge', 'processed' => $processed])->log('executed');
     }
 }

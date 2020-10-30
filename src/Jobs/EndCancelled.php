@@ -31,8 +31,7 @@ class EndCancelled implements ShouldQueue
      */
     public function handle()
     {
-        Log::debug('Cron job EndCancelled run');
         $processed = Subscriptions::endCancelled();    
-        Log::debug("Processed $processed");   
+        activity()->withProperties(['job' => 'EndCancelled', 'processed' => $processed])->log('executed');
     }
 }

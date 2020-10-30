@@ -15,12 +15,14 @@ class CloudPaymentsManager
     protected $publicId;
     protected $apiSecret;
     protected $apiUrl;
+    protected $logRequests;
 
     public function __construct()
     {
         $this->publicId = config('cloudpayments.publicId');
         $this->apiSecret = config('cloudpayments.apiSecret');
         $this->apiUrl = config('cloudpayments.apiUrl');
+        $this->logRequests = config('subscriptions.log.requests');
     }
 
     public function apiTest(): ApiResponse
@@ -100,6 +102,15 @@ class CloudPaymentsManager
         $response = Http::timeout(10)
             ->withBasicAuth($this->publicId, $this->apiSecret)
             ->post($this->apiUrl.$this->withLeadingSlash($url), $params);
+
+        if ($this->logRequests) {
+            activity()->withProperties([
+                'provider' => 'cloudpayments',
+                'url' => $this->apiUrl.$this->withLeadingSlash($url),
+                'request' => $params,
+                'response' => $response->json(),
+            ])->log('requested');
+        }
 
         return $response->successful() ? $response->json() : [];
     }
