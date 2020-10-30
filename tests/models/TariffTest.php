@@ -72,4 +72,46 @@ class TariffTest extends TestCase
 
         $this->assertEquals('trial', $tariff->type);
     }
+
+    public function testCrossedPrice()
+    {
+        $tariff = factory(Tariff::class)->create(['crossedPrice' => 230]);
+
+        $this->assertEquals(230, $tariff->refresh()->crossedPrice);
+    }
+
+    public function testCrossedPriceToArray()
+    {
+        $tariff = factory(Tariff::class)->make(['crossedPrice' => 230]);
+
+        $this->assertArrayHasKey('crossedPrice', $tariff->toArray());
+    }
+
+    public function testSavings()
+    {
+        $tariff = factory(Tariff::class)->states('periodic')->make(['price' => 300, 'crossedPrice' => 1000]);
+
+        $this->assertEquals(700, $tariff->savings);
+    }
+
+    public function testSavingsWithoutCrossedPrice()
+    {
+        $tariff = factory(Tariff::class)->states('periodic')->make(['price' => 300]);
+
+        $this->assertNull($tariff->savings);
+    }
+
+    public function testDescription()
+    {
+        $tariff = factory(Tariff::class)->create(['description' => 'test description']);
+
+        $this->assertEquals('test description', $tariff->refresh()->description);
+    }
+
+    public function testDescriptionToArray()
+    {
+        $tariff = factory(Tariff::class)->make(['description' => 'test description']);
+
+        $this->assertArrayHasKey('description', $tariff->toArray());
+    }
 }

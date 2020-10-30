@@ -19,13 +19,17 @@
         @method('DELETE')
     </form>
 
-<p class="my-4 mx-10">{{ $tariff->price }} {{ $tariff->currency }}
+<p class="my-4 mx-10">
+    <strike>{{ $tariff->crossedPrice }}</strike>
+    {{ $tariff->price }} {{ $tariff->currency }}
     / @lang('subscriptions::periods.'.$tariff->period)
     </p>
 @if($tariff->prolongable)
     <p class="my-4 mx-10">@lang('subscriptions::admin/tariffs.prolongable')</p>
 @endif
     <p class="my-4 mx-10">@lang('subscriptions::admin/tariffs.'.($tariff->visible ? 'visible' : 'invisible'))</p>
+    <p class="my-4 mx-10"><i>{{ $tariff->description }}</i></p>
+    <p class="my-4 mx-10">@lang('subscriptions::admin/tariffs.activeSubscriptions'): {{ $subscriptions }}</p>
 
 <h2 class="sub-title">@lang('subscriptions::admin/tariffs.features')</h2>
 

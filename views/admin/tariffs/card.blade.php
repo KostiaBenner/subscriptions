@@ -4,13 +4,15 @@
                 <span class="text-sm ml-2">{{ $tariff->slug }}</span>
                 <div>
                     <span class="text-sm text-gray-500">
-                        {{ $tariff->price }} {{ $tariff->currency }}
+                        <strike>{{ $tariff->crossedPrice }}</strike> {{ $tariff->price }} {{ $tariff->currency }}
                         / @lang('subscriptions::periods.'.$tariff->period)
                         @if($tariff->prolongable)
                             / @lang('subscriptions::admin/tariffs.prolongable')
                         @endif
                     </span>
                 </div>
+                <div><i>{{ $tariff->description }}</i></div>
+                <div>@lang('subscriptions::admin/tariffs.activeSubscriptions'): {{ $tariff->subscriptions_count }}</div>
             </div>
             <div class="ml-auto">
                 @if($tariff->price == 0 and $tariff->visible)

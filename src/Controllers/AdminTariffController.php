@@ -35,7 +35,10 @@ class AdminTariffController extends Controller
      */
     public function index()
     {
-        $tariffs = Tariff::all();
+        $tariffs = Tariff::withCount(['subscriptions' => function ($query) {
+                $query->where('status', 'Active')->orWhere('status', 'Cancelled')->orWhere('status', 'PastDue');
+            }])->get();
+;
         return view('subscriptions::admin.tariffs.list', ['tariffs' => $tariffs]);
     }
 
@@ -75,7 +78,10 @@ class AdminTariffController extends Controller
      */
     public function show(Tariff $tariff)
     {
-        return view('subscriptions::admin.tariffs.show', ['tariff' => $tariff]);
+        $subscriptions = $tariff->subscriptions()
+            ->where('status', 'Active')->orWhere('status', 'Cancelled')->orWhere('status', 'PastDue')
+            ->count();
+        return view('subscriptions::admin.tariffs.show', ['tariff' => $tariff, 'subscriptions' => $subscriptions]);
     }
 
     /**

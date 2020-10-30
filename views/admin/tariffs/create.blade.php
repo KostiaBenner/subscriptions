@@ -70,6 +70,32 @@
         <label for="visible">@lang('subscriptions::admin/tariffs.visible')</label>
     </div>
 
+    <h2 class="sub-title">@lang('subscriptions::admin/tariffs.marketing')</h2>
+
+    <div class="flex">
+        <div class="form-group w-1/2 @error('crossedPrice') has-error @enderror">
+            <label for="crossedPrice">@lang('subscriptions::admin/tariffs.crossedPrice')</label>
+            <input type="text" name="crossedPrice" value="{{ old('crossedPrice') }}" placeholder="">
+            @error('crossedPrice')
+                <div class="error-description">
+                    @lang('subscriptions::admin/tariffs.'.$message)
+                </div>
+            @enderror
+        </div>
+    </div>
+
+    @foreach(config('app.locales') as $locale)
+        <div class="form-group @error('description.'.$locale) has-error @enderror">
+            <label for="description[{{ $locale }}]">@lang('subscriptions::admin/tariffs.description') ({{ $locale }})</label>
+            <textarea name="description[{{ $locale }}]" rows="7">{{ old('description.'.$locale) }}</textarea>
+            @error('description.'.$locale)
+                <div class="error-description">
+                    @lang('subscriptions::admin/tariffs.'.$message)
+                </div>
+            @enderror
+        </div>
+    @endforeach
+
     <h2 class="sub-title">@lang('subscriptions::admin/tariffs.features')</h2>
 
     @foreach(config('subscriptions.features') as $feature)

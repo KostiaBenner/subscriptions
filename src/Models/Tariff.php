@@ -4,12 +4,13 @@ namespace Nikservik\Subscriptions\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Nikservik\Subscriptions\Models\Subscription;
 use Nikservik\Subscriptions\TranslatableField;
 
 class Tariff extends Model
 {
     protected $fillable = [
-        'slug', 'name', 'price', 'currency', 'period', 'prolongable'
+        'slug', 'name', 'price', 'crossedPrice', 'currency', 'period', 'prolongable', 'description',
     ];
 
     protected $casts = [
@@ -17,9 +18,15 @@ class Tariff extends Model
         'availability' => 'array',
         'texts' => 'array',
         'name' => TranslatableField::class,
+        'description' => TranslatableField::class,
     ];
 
-    protected $appends = ['type', 'visible', 'default'];
+    protected $appends = ['type', 'visible', 'default', 'crossedPrice'];
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 
     public function getFeaturesAttribute($value)
     {
@@ -49,6 +56,26 @@ class Tariff extends Model
         $availability['visible'] = (boolean) $visible;
         $this->availability = $availability;
     }   
+    
+    public function getCrossedPriceAttribute() 
+    {
+        return Arr::get($this->texts, 'crossedPrice', null);
+    }   
+
+    public function setCrossedPriceAttribute($crossedPrice) 
+    {
+        $texts = $this->texts;
+        $texts['crossedPrice'] = $crossedPrice ? (float) $crossedPrice : null;
+        $this->texts = $texts;
+    }   
+    
+    public function getSavingsAttribute() 
+    {
+        if ($this->crossedPrice === null)
+            return null;
+
+        return $this->crossedPrice - $this->price;
+    }   
 
     public function getTypeAttribute()
     {
@@ -63,6 +90,6 @@ class Tariff extends Model
 
     public function toCopy()
     {
-        return array_merge($this->toArray(), ['name' => $this->name]);
+        return array_merge($this->toArray(), ['name' => $this->name, 'description' => $this->description]);
     }
 }
