@@ -4,97 +4,91 @@ namespace Tests\Subscriptions;
 
 use App\User;
 use Carbon\Carbon;
+use Carbon\Carbonite;
+use Illuminate\Support\Facades\Mail;
+use Nikservik\Subscriptions\Facades\Subscriptions;
+use Nikservik\Subscriptions\Mail\SubscriptionActivated;
+use Nikservik\Subscriptions\Mail\SubscriptionCancelled;
 use Nikservik\Subscriptions\Models\Subscription;
 use Nikservik\Subscriptions\Models\Tariff;
 use Tests\TestCase;
 
 class SubscriptionTraitTest extends TestCase
 {
+    public function testToken()
+    {
+        $user = factory(User::class)->make();
 
-    public function testSubscriptionActive()
+        $user->token = 'test token';
+
+        $this->assertEquals('test token', $user->token);
+    }
+
+    public function testCardLastFour()
+    {
+        $user = factory(User::class)->make();
+
+        $user->cardLastFour = '1234';
+
+        $this->assertEquals('1234', $user->cardLastFour);
+    }
+
+    public function testDelete()
     {
         $subscription = factory(Subscription::class)->states('active')->create();
 
-        $user = $subscription->user;
+        $subscription->user->delete();
 
-        $this->assertNotNull($user->subscription());
-    }
-
-    public function testSubscriptionCancelled()
-    {
-        $subscription = factory(Subscription::class)->create(['status' => 'Cancelled', 'next_transaction_date' => Carbon::tomorrow()]);
-
-        $user = $subscription->user;
-
-        $this->assertNotNull($user->subscription());
-    }
-
-    public function testSubscriptionEnded()
-    {
-        $subscription = factory(Subscription::class)->create(['status' => 'Ended']);
-
-        $user = $subscription->user;
-
-        $this->assertNull($user->subscription());
-    }
-
-    public function testSubscriptionAttribute()
-    {
-        $subscription = factory(Subscription::class)->states('active')->create();
-
-        $user = $subscription->user;
-
-        $this->assertIsArray($user->subscription);
-    }
-
-    public function testEmptyFeatures()
-    {
-        $subscription = factory(Subscription::class)->create(['features' => null]);
-
-        $user = $subscription->user;
-
-        $this->assertIsArray($user->features);
-    }
-
-    public function testFeatures()
-    {
-        $subscription = factory(Subscription::class)->states('active')->create(['features' => ['feature1', 'feature2']]);
-
-        $user = $subscription->user;
-
-        $this->assertIsArray($user->features);
-        $this->assertGreaterThan(0, count($user->features));
+        $this->assertEquals('Ended', $subscription->refresh()->status);
     }
 
     public function testHadTrial()
     {
         $subscription = factory(Subscription::class)->states('trial')->create(['status' => 'Ended']);
 
+        $this->assertEquals(1, $subscription->user->hadTrial);
+    }
+
+    public function testHadTrialNone()
+    {
+        $subscription = factory(Subscription::class)->states('paid')->create();
+
+        $this->assertEquals(0, $subscription->user->hadTrial);
+    }
+
+    public function testFeatures()
+    {
+        $subscription = factory(Subscription::class)->states('active')->create(['features' => ['feature 1', 'feature 2']]);
+
+        $this->assertEquals(2, count($subscription->user->features));
+        $this->assertEquals('feature 1', $subscription->user->features[0]);
+    }
+
+    public function testSubscriptionActive()
+    {
+        $subscription = factory(Subscription::class)->states('active')->create();
         $user = $subscription->user;
 
-        $this->assertTrue($user->hadTrial);
+        $this->assertNotNull($user->subscription());
+        $this->assertEquals($subscription->id, $user->subscription()->id);
     }
 
-    public function testGetToken()
+    public function testSubscriptionPastDue()
     {
-        $user = factory(User::class)->state('withToken')->make();
+        $subscription = factory(Subscription::class)->create(['status' => 'PastDue']);
+        $user = $subscription->user;
 
-        $this->assertIsString($user->token);
+        $this->assertNotNull($user->subscription());
+        $this->assertEquals($subscription->id, $user->subscription()->id);
     }
 
-    public function testSetToken()
+    public function testSubscriptionCancelled()
     {
-        $user = factory(User::class)->make();
-        $user->token = 'user token';
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid')->create(['status' => 'Cancelled', 'next_transaction_date' => Carbon::parse('2020-01-05')]);
+        $user = $subscription->user;
 
-        $this->assertEquals('user token', $user->token);
-    }
-
-    public function testSetGetCardLastFour()
-    {
-        $user = factory(User::class)->make();
-        $user->cardLastFour = '1234';
-
-        $this->assertEquals('1234', $user->cardLastFour);
+        $this->assertNotNull($user->subscription());
+        $this->assertEquals($subscription->id, $user->subscription()->id);
     }
 }

@@ -39,11 +39,12 @@ trait Subscription
 
     public function subscription()
     {
-        return $this->subscriptions()->where('status', 'Active')
-            ->orWhere(function($query) {
-                $query->where('status', 'Cancelled')
-                      ->where('next_transaction_date', '>', Carbon::now());
-            })->orderBy('status')->orderBy('next_transaction_date', 'desc')->first();
+        return $this->subscriptions()
+            ->where(function($query) {
+                $query->where([['status', '=', 'Cancelled'], ['next_transaction_date', '>', Carbon::now()]])
+                      ->orWhere('status', 'PastDue')
+                      ->orWhere('status', 'Active');
+            })->orderBy('next_transaction_date', 'desc')->first();
     }
 
     public function getFeaturesAttribute() 
