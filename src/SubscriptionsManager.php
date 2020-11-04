@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Nikservik\Subscriptions\Facades\Payments;
+use Nikservik\Subscriptions\Mail\SubscriptionAboutToEnd;
 use Nikservik\Subscriptions\Mail\SubscriptionAboutToRenew;
 use Nikservik\Subscriptions\Mail\SubscriptionActivated;
 use Nikservik\Subscriptions\Mail\SubscriptionCancelled;
@@ -112,6 +113,27 @@ class SubscriptionsManager
 
         foreach ($toWarn as $subscription) {
             Mail::to($subscription->user->email)->queue(new SubscriptionAboutToRenew($subscription));
+        }
+
+        return $toWarn->count();
+    }
+
+    public function warnBeforeEnd()
+    {
+        if (! $this->warnBefore)
+            return;
+
+        $toWarn = Subscription::where('next_transaction_date', '>', 
+                Carbon::now()->add($this->warnTime)->sub('12 hours'))
+            ->where('next_transaction_date', '<', 
+                Carbon::now()->add($this->warnTime)->add('12 hours'))
+            ->where(function ($query) {
+                $query->where([['status', '=', 'Active'], ['price', '=', 0], ['prolongable', '=', false]])
+                ->orWhere([['status', '=', 'Cancelled'], ['price', '>', 0], ['prolongable', '=', true]]);
+            })->get();
+
+        foreach ($toWarn as $subscription) {
+            Mail::to($subscription->user->email)->queue(new SubscriptionAboutToEnd($subscription));
         }
 
         return $toWarn->count();
