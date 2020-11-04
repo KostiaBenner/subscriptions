@@ -2,6 +2,9 @@
 
 namespace Tests\Subscriptions;
 
+use Carbon\Carbon;
+use Carbon\Carbonite;
+use Nikservik\Subscriptions\Models\Subscription;
 use Nikservik\Subscriptions\Models\Tariff;
 use Tests\TestCase;
 
@@ -113,5 +116,96 @@ class TariffTest extends TestCase
         $tariff = factory(Tariff::class)->make(['description' => 'test description']);
 
         $this->assertArrayHasKey('description', $tariff->toArray());
+    }
+
+    public function testPriceToPay()
+    {
+        $tariff = factory(Tariff::class)->make();
+
+        $this->assertEquals($tariff->price, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayMonthlyToAnnual()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => '1 month', 'price' => 200, 'last_transaction_date' => Carbon::parse('2019-12-17'), 'next_transaction_date' => Carbon::parse('2020-01-16')]);
+        $tariff = factory(Tariff::class)->states('periodic')->create(['period' => '1 year', 'price' => 2000]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(2000 - 200 / 2, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayAnnualToMonthly()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => '1 year', 'price' => 2000, 'last_transaction_date' => Carbon::parse('2019-12-17'), 'next_transaction_date' => Carbon::parse('2020-12-16')]);
+        $tariff = factory(Tariff::class)->states('periodic')->create(['period' => '1 month', 'price' => 200]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(0, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayFloatPart()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => '1 month', 'price' => 200, 'last_transaction_date' => Carbon::parse('2019-12-17'), 'next_transaction_date' => Carbon::parse('2020-01-15')]);
+        $tariff = factory(Tariff::class)->states('periodic')->create(['period' => '1 year', 'price' => 2000]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(1903.45, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayMonthlyToLifetime()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => '1 month', 'price' => 200, 'last_transaction_date' => Carbon::parse('2019-12-17'), 'next_transaction_date' => Carbon::parse('2020-01-16')]);
+        $tariff = factory(Tariff::class)->states('lifetime')->create(['price' => 20000]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(20000 - 200 / 2, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayLifeTimeToLifetime()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => 'endless', 'price' => 2000, ]);
+        $tariff = factory(Tariff::class)->states('lifetime')->create(['price' => 20000]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(20000 - 2000, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayLifeTimeToLifetimeCheaper()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => 'endless', 'price' => 20000, ]);
+        $tariff = factory(Tariff::class)->states('lifetime')->create(['price' => 10000]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(0, $tariff->priceToPay);
+    }
+
+    public function testPriceToPayLifeTimeToPeriodic()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => 'endless', 'price' => 20000, ]);
+        $tariff = factory(Tariff::class)->states('periodic')->create(['price' => 1000]);
+
+        $this->actingAs($subscription->user);
+
+        $this->assertEquals(1000, $tariff->priceToPay);
     }
 }

@@ -77,7 +77,7 @@ class PaymentApiResponseFactory extends ApiResponseFactory
     {
         return self::make($states, [
             'Model' => [
-                'Amount' => $tariff->price,
+                'Amount' => $tariff->priceToPay,
                 'Currency' => $tariff->currency,
                 'AccountId' => $user->id,
             ]

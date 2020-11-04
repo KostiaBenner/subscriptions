@@ -3,6 +3,8 @@
 namespace Tests\Subscriptions;
 
 use App\User;
+use Carbon\Carbon;
+use Carbon\Carbonite;
 use Illuminate\Support\Arr;
 use Nikservik\Subscriptions\CloudPayments\ApiResponseFactory;
 use Nikservik\Subscriptions\CloudPayments\PaymentApiResponse;
@@ -52,6 +54,23 @@ class PaymentsManagerTest extends TestCase
 
         $this->assertTrue((boolean) $result);
         $this->assertEquals(1, $user->subscription()->payments()->count());
+    }
+
+    public function testChargeByCryptWithPreviousSubscription()
+    {
+        Carbonite::freeze('2020-01-01');
+        $subscription = factory(Subscription::class)->states('paid', 'active')
+            ->create(['period' => '1 month', 'price' => 200, 'last_transaction_date' => Carbon::parse('2019-12-17'), 'next_transaction_date' => Carbon::parse('2020-01-16')]);
+        $user = $subscription->user;
+        $this->actingAs($user);
+        $tariff = factory(Tariff::class)->states('periodic')->create(['period' => '1 year', 'price' => 2000]);
+        CloudPayments::shouldReceive('paymentsCardsCharge')
+            ->andReturn(PaymentApiResponseFactory::makeWithUserAndTariff(['successful', 'withToken', 'withTransaction'], $user, $tariff));
+
+        $result = Payments::chargeByCrypt($user, $tariff, 'Cardholder', '127.0.0.1', '123456787654321');
+
+        $this->assertTrue((boolean) $result);
+        $this->assertEquals(1900, $user->subscription()->payments()->first()->amount);
     }
 
     public function testChargeByCryptDeclined()

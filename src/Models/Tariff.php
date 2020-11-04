@@ -2,8 +2,10 @@
 
 namespace Nikservik\Subscriptions\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Nikservik\Subscriptions\Models\Subscription;
 use Nikservik\Subscriptions\TranslatableField;
 
@@ -21,7 +23,7 @@ class Tariff extends Model
         'description' => TranslatableField::class,
     ];
 
-    protected $appends = ['type', 'visible', 'default', 'crossedPrice'];
+    protected $appends = ['type', 'visible', 'default', 'crossedPrice', 'priceToPay'];
 
     public function subscriptions()
     {
@@ -86,6 +88,32 @@ class Tariff extends Model
             return 'trial';
 
         return 'free';
+    }
+
+    public function getPriceToPayAttribute()
+    {
+        if (!Auth::check() || $this->price == 0) 
+            return $this->price;
+        
+        $subscription = Auth::user()->subscription();
+        if ($subscription->price == 0)
+            return $this->price;
+
+        if ($subscription->period == 'endless') {
+            if ($this->period == 'endless')
+                return ($this->price - $subscription->price) > 0 ? $this->price - $subscription->price : 0;
+            else
+                return $this->price;
+        }
+
+        $paidPeriod = $subscription->next_transaction_date->timestamp - $subscription->last_transaction_date->timestamp;
+        $paidPeriodLeft = $subscription->next_transaction_date->timestamp - Carbon::now()->timestamp;
+
+        $toPay = round($this->price - $paidPeriodLeft / $paidPeriod * $subscription->price, 2);
+        if ($toPay < 0)
+            $toPay = 0;
+
+        return $toPay;
     }
 
     public function toCopy()

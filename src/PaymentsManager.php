@@ -37,7 +37,7 @@ class PaymentsManager
 
     public function chargeByCrypt(User $user, Tariff $tariff, string $cardholderName, string $ip,  string $crypt)
     {
-        $bill = new CardChargeRequest($tariff->price, $tariff->currency, 
+        $bill = new CardChargeRequest($tariff->priceToPay, $tariff->currency, 
             $cardholderName, $crypt, $ip, $user->id, $user->email,
             __('subscriptions::payments.charge', ['app' => Str::after(config('app.url'), '//')])
         );
