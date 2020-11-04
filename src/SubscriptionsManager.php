@@ -233,7 +233,9 @@ class SubscriptionsManager
 
     protected function endPreviousSubscription(Subscription $newSubscription)
     {
-        $newSubscription->user->subscriptions()->where('status', 'Active')
+        $newSubscription->user->subscriptions()->where(function ($query) {
+                $query->where('status', 'Active')->orWhere('status', 'Cancelled')->orWhere('status', 'PastDue');
+            })
             ->where('id', '<>', $newSubscription->id)
             ->update(['status' => 'Ended']);
     }

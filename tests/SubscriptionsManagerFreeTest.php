@@ -85,6 +85,32 @@ class SubscriptionsManagerFreeTest extends TestCase
         Mail::assertQueued(SubscriptionActivated::class);
     }
 
+    public function testActivateEndPreviousCancelled()
+    {
+        Mail::fake();
+        $newTariff = factory(Tariff::class)->states('free')->create();
+        $previousSubscription = factory(Subscription::class)->create(['status' => 'Cancelled']);
+        $user = $previousSubscription->user;
+
+        Subscriptions::activate($user, $newTariff);
+
+        $this->assertEquals('Ended', $previousSubscription->refresh()->status);
+        Mail::assertQueued(SubscriptionActivated::class);
+    }
+
+    public function testActivateEndPreviousPastDue()
+    {
+        Mail::fake();
+        $newTariff = factory(Tariff::class)->states('free')->create();
+        $previousSubscription = factory(Subscription::class)->create(['status' => 'PastDue']);
+        $user = $previousSubscription->user;
+
+        Subscriptions::activate($user, $newTariff);
+
+        $this->assertEquals('Ended', $previousSubscription->refresh()->status);
+        Mail::assertQueued(SubscriptionActivated::class);
+    }
+
     public function testActivateFirstNoMail()
     {
         Mail::fake();
