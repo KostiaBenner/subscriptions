@@ -11,6 +11,7 @@ use Nikservik\Subscriptions\Jobs\ChargePaid;
 use Nikservik\Subscriptions\Jobs\EndCancelled;
 use Nikservik\Subscriptions\Jobs\EndOutdated;
 use Nikservik\Subscriptions\Jobs\WarnBeforeCharge;
+use Nikservik\Subscriptions\Jobs\WarnBeforeEnd;
 use Nikservik\Subscriptions\Models\Feature;
 use Nikservik\Subscriptions\Models\Payment;
 use Nikservik\Subscriptions\Models\Tariff;
@@ -64,8 +65,9 @@ class SubscriptionsServiceProvider extends AuthServiceProvider
             $schedule = $this->app->make(Schedule::class);
             $schedule->job(new ChargePaid)->hourlyAt(30);
             $schedule->job(new WarnBeforeCharge)->dailyAt('1:00');
-            $schedule->job(new EndCancelled)->dailyAt('2:00');
-            $schedule->job(new EndOutdated)->dailyAt('3:00');
+            $schedule->job(new WarnBeforeEnd)->dailyAt('2:00');
+            $schedule->job(new EndCancelled)->dailyAt('3:00');
+            $schedule->job(new EndOutdated)->dailyAt('4:00');
         });
         $this->publishes([
             __DIR__.'/../config/subscriptions.php' => config_path('subscriptions.php')
