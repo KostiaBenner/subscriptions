@@ -62,7 +62,7 @@
             @enderror
         </div>
         <div class="form-group w-1/2 pb-4">
-            <input type="checkbox" name="prolongable" value="1" @if(old('prolongable'))checked=""@endif>
+            <input type="checkbox" name="prolongable" value="1" @if(old('prolongable')||$tariff->prolongable)checked="checked"@endif>
             <label for="prolongable">@lang('subscriptions::admin/tariffs.prolongable')</label>
         </div>
     </div>
